@@ -4,14 +4,14 @@ import pandas as pd
 
 st.title("Music Streaming Database Web Application")
 
-# Flask backend URL
+#Flask backend URL
 FLASK_URL = "https://music-streaming-flask-backend.onrender.com/query"
 
-# Sidebar for table schema
+#Sidebar for table schema
 with st.sidebar:
     st.header("Database Schema")
     
-    # Collapsible sections for each table
+    #Collapsible sections for each table
     with st.expander("albums", expanded=False):
         st.write("""
         - **album_id**: character varying(255), not null (Primary Key)
@@ -87,17 +87,15 @@ with st.sidebar:
         - **time_signature**: integer, not null, default 4
         """)
 
-# Text area for SQL query input
+#Text area for SQL query input
 query = st.text_area("Enter your SQL query:", "SELECT * FROM artists LIMIT 5;")
 
-# Button to execute the query
+#Button to execute the query
 if st.button("Execute Query"):
     try:
-        # Send the query to the Flask backend
         response = requests.post(FLASK_URL, json={"query": query})
-        response.raise_for_status()  # Raise an error for bad status codes
+        response.raise_for_status()
 
-        # Parse the response
         data = response.json()
 
         if "error" in data:
@@ -105,7 +103,6 @@ if st.button("Execute Query"):
         elif "message" in data:
             st.success(f"{data['message']} (Rows affected: {data['rows_affected']})")
         else:
-            # Display the results in a table
             df = pd.DataFrame(data)
             st.write("Query Results:")
             st.dataframe(df)
@@ -113,7 +110,7 @@ if st.button("Execute Query"):
     except requests.exceptions.RequestException as e:
         st.error(f"Failed to execute query: {e}")
 
-# Note about potential 500 Internal Server Error
+#Note about potential 500 Internal Server Error
 st.markdown("""
 **Note**: If the app gives a 500 Internal Server Error, it is likely due to Render winding down the free tier backend due to inactivity. Please wait 5–10 minutes after getting the error for it to go live again.
 """)
